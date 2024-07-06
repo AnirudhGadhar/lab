@@ -1,39 +1,41 @@
-#include<stdio.h>
-#include<unistd.h>
-#include<sys/wait.h>
 
-int main()
-{
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main() {
     pid_t pid;
     int status;
+    	
+   
+    pid = fork();
     
-    pid=fork();
-    
-    if(pid<0)
-    {
-        printf("fork failed");
+    if (pid < 0) {
+        printf("Error: fork() failed.\n");
         return 1;
+    } else if (pid == 0) {
+    
         
-    }
-    else if(pid==0)
-    {
-        printf("this is child process with pid %d \n", getpid());
-         printf("parent process with pid %d \n", getppid());
+        printf("This is the child process with PID: %d\n", getpid());
+        printf("Parent process PID: %d\n", getppid());
+        
+        
+        execlp("/bin/ls", "ls", NULL);
+        
+        printf("This should not be printed if exec() is successful.\n");
+        return 0;
+    } else {
+        
     
     
-    execlp("/bin/ls","ls", NULL);
-     printf("this should not be printed if exec() is sucessful");
-     return 0;
+        printf("This is the parent process with PID: %d\n", getpid());
+        printf("Child process PID: %d\n", pid);
+        
+
+        wait(&status);
+        
+        printf("Child process exited with status: %d\n", status);
+        
+        return 0;
     }
-    
-    else
-    {
-         printf("this is parent process with pid %d \n", getpid());
-          printf("child process with pid %d \n", pid);
-          wait(&status);
-           printf("child process excited with status %d \n ",status);
-           return 0;
-           
-    }
-     
 }
